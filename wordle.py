@@ -5,8 +5,10 @@ from typing import List
 from colorama import init, Fore, Style
 
 WORD_LEN = 5
-NUM_TRIES = 6
+WORD_FREQUENCY = 7.0
 WORD_PATTERN = r'^[a-zA-Z]+$'
+NUM_TRIES = 6
+
 WORDS_API_URI = 'https://wordsapiv1.p.rapidapi.com/words/'
 WORDS_API_KEY_ENV_VAR = 'WORDS_API_API_KEY'
 WORDS_API_HTTP_HEADERS = {
@@ -18,8 +20,8 @@ WORDS_API_HTTP_HEADERS = {
 def get_word() -> str:
     querystring = {
         'letterPattern': WORD_PATTERN,
-        'letters': 5,
-        'frequencymin': 7,
+        'letters': WORD_LEN,
+        'frequencymin': WORD_FREQUENCY,
         'random': 'true',
     }
 
@@ -29,6 +31,10 @@ def get_word() -> str:
         headers=WORDS_API_HTTP_HEADERS,
         params=querystring
     )
+
+    if response.status_code >= 400:
+        print(f'Failure making request to WordsAPI: {response.json()}\nIs your API key set correctly?')
+        exit(1)
 
     return response.json()['word'].lower()
 
@@ -121,3 +127,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    exit(0)
